@@ -6,8 +6,28 @@ namespace MillionAndUp.Models
         public ApiContext(DbContextOptions<ApiContext> options) : base(options) { }
         public DbSet<Owner> Owners { get; set; }
         public DbSet<Property> Properties { get; set; }
-        public DbSet<PropertyImage> PropertiesImage { get; set; }
-        public DbSet<PropertyTrace> PropertiesTrace { get; set; }
+        public DbSet<PropertyImage> PropertiesImages { get; set; }
+        public DbSet<PropertyTrace> PropertiesTraces { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Property>()
+                .HasOne(o => o.Owner)
+                .WithMany(p => p.Properties)
+                .HasForeignKey(o => o.IdOwner);
+
+            modelBuilder.Entity<PropertyTrace>()
+                .HasOne(o => o.Property)
+                .WithMany(p => p.PropertyTraces)
+                .HasForeignKey(o => o.IdProperty);
+
+            modelBuilder.Entity<PropertyImage>()
+             .HasOne(o => o.Property)
+             .WithMany(p => p.PropertyImages)
+             .HasForeignKey(o => o.IdProperty);
+
+            new DbInitializer(modelBuilder).Seed();
+        }
 
     }
 
