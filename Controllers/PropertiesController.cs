@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.TeamFoundation.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using MillionAndUp.Models;
 
 namespace MillionAndUp.Controllers
 {
-    [Route("api/Properties")]
+    [Route("api/[controller]")]
     [ApiController]
     public class PropertiesController : ControllerBase
     {
@@ -50,36 +53,100 @@ namespace MillionAndUp.Controllers
             return @property;
         }
 
-        // PUT: api/Properties/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProperty(Guid id, Property @property)
+        [HttpGet]
+        [Route("GetPropertiesFilter")]
+        public Task<ActionResult<Property>> GetPropertyFilter([FromQuery] Property filter)
         {
-            if (id != @property.IdProperty)
+
+            if (filter == null || IsEmptyObject(filter))
             {
-                return BadRequest();
+                return Task.FromResult<ActionResult<Property>>(BadRequest("Error empty filter"));
             }
 
-            _context.Entry(@property).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PropertyExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var resultados = _context.Properties.AsQueryable();
 
-            return NoContent();
+            if (filter.IdOwner != null)
+            {
+                resultados = resultados.Where(e => e.IdOwner == filter.IdOwner);
+            }
+           
+
+            if (!string.IsNullOrEmpty(filter.Year))
+            {
+                resultados = resultados.Where(e => e.Year.Contains(filter.Year));
+            }
+           
+
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                resultados = resultados.Where(e => e.Name.Contains(filter.Name));
+            }
+          
+            if (!string.IsNullOrEmpty(filter.CodeInternal))
+            {
+                resultados = resultados.Where(e => e.CodeInternal.Contains(filter.CodeInternal));
+            }
+           
+
+            if (filter.Price > 0)
+            {
+                resultados = resultados.Where(e => e.Price == filter.Price);
+            }
+           
+
+
+            return Task.FromResult<ActionResult<Property>>(Ok(resultados));
         }
+
+        private bool IsEmptyObject(object obj)
+        {
+            return obj.GetType().GetProperties().All(property => property.GetValue(obj) == null);
+        }
+
+
+
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateProperty(Guid id, [FromBody] Property propertyUpdateModel)
+        {
+            var existingProperty = _context.Properties.Find(id);
+            if (existingProperty == null)
+            {
+                return NotFound();
+            }
+            existingProperty.Name = propertyUpdateModel.Name;
+            existingProperty.Price = propertyUpdateModel.Price;
+            existingProperty.CodeInternal = propertyUpdateModel.CodeInternal;
+            existingProperty.Address = propertyUpdateModel.Address;
+            existingProperty.Year = propertyUpdateModel.Year;
+            existingProperty.IdOwner = propertyUpdateModel.IdOwner;
+
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPut("Property/{id}")]
+        public IActionResult UpdatePriceProperty(Guid id, [FromBody] Property propertyUpdateModel)
+        {
+            var existingProperty = _context.Properties.Find(id);
+            if (existingProperty == null)
+            {
+                return NotFound();
+            }
+            existingProperty.Price = propertyUpdateModel.Price;
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+       
+
+
+
 
         // POST: api/Properties
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -116,9 +183,5 @@ namespace MillionAndUp.Controllers
             return NoContent();
         }
 
-        private bool PropertyExists(Guid id)
-        {
-            return (_context.Properties?.Any(e => e.IdProperty == id)).GetValueOrDefault();
-        }
     }
 }

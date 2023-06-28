@@ -8,11 +8,11 @@ namespace MillionAndUp.Models
     {
         [Key]
         public Guid IdProperty { get; set; }
-        public string Name { get; set; }
-        public string Address { get; set; }
-        public double Price { get; set; }
-        public string CodeInternal { get; set; }
-        public string Year { get; set; }
+        public string? Name { get; set; }
+        public string? Address { get; set; }
+        public double? Price { get; set; }
+        public string? CodeInternal { get; set; }
+        public string? Year { get; set; }
         // One-to-many relation with Owner
         public Guid? IdOwner { get; set; }
         public Owner? Owner { get; set; }
