@@ -9,6 +9,10 @@ namespace MillionAndUp.Models
         public DbSet<PropertyImage> PropertiesImages { get; set; }
         public DbSet<PropertyTrace> PropertiesTraces { get; set; }
 
+        /// <summary>
+        /// Create Models in Database with entity framework
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Property>()
@@ -26,6 +30,8 @@ namespace MillionAndUp.Models
              .WithMany(p => p.PropertyImages)
              .HasForeignKey(o => o.IdProperty);
 
+
+            //Seed data in Database
             new DbInitializer(modelBuilder).Seed();
         }
 
