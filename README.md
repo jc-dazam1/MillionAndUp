@@ -13,7 +13,7 @@ e) List Property with filters.
 
 ## Architeture
 
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
+![Logo]([https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png](https://i.ibb.co/r58VsnX/architecture.png)
 This API uses:
 - .Net
 - Sql Server
