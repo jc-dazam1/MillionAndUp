@@ -7,63 +7,74 @@ using MillionAndUp.Models;
 using System.Configuration;
 using System.Security.Cryptography;
 using System.Text;
+using System;
 
-var builder = WebApplication.CreateBuilder(args);
 
-//Get appsettings configuration.
-IConfigurationRoot configuration = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.json")
-            .Build();
+            // Punto de entrada principal del programa
+            // Aquí puedes realizar cualquier configuración inicial si es necesario
+            // y luego iniciar el servidor de la API
 
-// Add services to the container.
+            var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(o =>
-{
-    var Key = Encoding.UTF8.GetBytes(configuration["JWT:Key"]);
-    o.SaveToken = true;
-    o.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = configuration["JWT:Issuer"],
-        ValidAudience = configuration["JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Key)
-    };
-});
+            //Get appsettings configuration.
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                        .AddJsonFile("appsettings.json")
+                        .Build();
 
-builder.Services.AddSingleton<IJWTManagerRepository, JWTManagerRepository>();
+            // Add services to the container.
 
-builder.Services.AddControllers();
+            builder.Services.AddControllers();
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+            {
+                var Key = Encoding.UTF8.GetBytes(configuration["JWT:Key"]);
+                o.SaveToken = true;
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["JWT:Issuer"],
+                    ValidAudience = configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Key)
+                };
+            });
 
-builder.Services.AddDbContext<ApiContext>(opt => 
+            builder.Services.AddSingleton<IJWTManagerRepository, JWTManagerRepository>();
 
-opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+            builder.Services.AddControllers();
 
-var app = builder.Build();
+            builder.Services.AddDbContext<ApiContext>(opt =>
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+            opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
-app.UseHttpsRedirection();
+            var app = builder.Build();
 
-app.UseAuthentication(); // This need to be added	
-app.UseAuthorization();
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
-app.MapControllers();
+            app.UseHttpsRedirection();
 
-app.Run();
+            app.UseAuthentication(); // This need to be added	
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.Run();
+
+
+
+
+

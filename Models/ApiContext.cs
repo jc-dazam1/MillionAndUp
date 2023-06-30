@@ -8,6 +8,12 @@ namespace MillionAndUp.Models
         public DbSet<Property> Properties { get; set; }
         public DbSet<PropertyImage> PropertiesImages { get; set; }
         public DbSet<PropertyTrace> PropertiesTraces { get; set; }
+        //Constructor
+        public ApiContext()
+        {
+
+        }
+
 
         /// <summary>
         /// Create Models in Database with entity framework
