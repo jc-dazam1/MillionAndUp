@@ -1,3 +1,3 @@
 # MillionAndUp
 
-![ImgMVC](https://i.ibb.co/44vHdB0/architecture.png)
+![Image text](https://github.com/zzuljs/CppLearning/blob/master/CppLearning/raw/master/Itachi.jpg)
