@@ -25,6 +25,8 @@ namespace MillionAndUp.Controllers
             _context = context;
         }
 
+
+
         // GET: api/Properties
         [HttpGet]
         [Route("GetAllProperties")]
